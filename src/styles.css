@@ -195,3 +195,7 @@
 .hf-table td { padding: 0.75rem; border-bottom: 1px solid var(--hf-border); }
 .hf-tag { padding: 0.2rem 0.65rem; border-radius: 50px; font-size: 0.78rem; font-weight: 600; background: var(--hf-soft); color: var(--hf-primary); }
 .hf-tag.reglamento { background: #e6f4ea; color: #2f855a; }
+
+.hf-check.si { color: #1e7d46; font-weight: 700; }
+.hf-check.si small { display: block; font-weight: 400; color: #6b6480; font-size: 0.75rem; }
+.hf-check.no { color: #b9b2cc; }
