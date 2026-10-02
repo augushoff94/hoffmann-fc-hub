@@ -18,7 +18,43 @@ export const Route = createFileRoute("/admin")({
   component: Admin,
 });
 
-type Filtro = "todos" | "seguro" | "reglamento";
+type Filtro = "todos" | "completos" | "incompletos";
+
+type Confirmacion = {
+  id: string;
+  nombre: string;
+  dni: string;
+  documento: string;
+  created_at: string;
+};
+
+type Persona = {
+  nombre: string;
+  dni: string;
+  seguro: string | null;
+  reglamento: string | null;
+};
+
+function agrupar(data: Confirmacion[]): Persona[] {
+  const mapa = new Map<string, Persona>();
+  for (const r of data) {
+    const clave = r.dni.trim().toLowerCase() || r.nombre.trim().toLowerCase();
+    const actual = mapa.get(clave) ?? { nombre: r.nombre, dni: r.dni, seguro: null, reglamento: null };
+    if (r.documento === "seguro" && (!actual.seguro || r.created_at > actual.seguro)) actual.seguro = r.created_at;
+    if (r.documento === "reglamento" && (!actual.reglamento || r.created_at > actual.reglamento)) actual.reglamento = r.created_at;
+    mapa.set(clave, actual);
+  }
+  return [...mapa.values()].sort((a, b) => a.nombre.localeCompare(b.nombre, "es"));
+}
+
+function Tilde({ fecha }: { fecha: string | null }) {
+  if (!fecha) return <span className="hf-check no">—</span>;
+  return (
+    <span className="hf-check si" title={new Date(fecha).toLocaleString("es-AR")}>
+      ✓ <small>{new Date(fecha).toLocaleString("es-AR")}</small>
+    </span>
+  );
+}
 
 function Admin() {
   const [filtro, setFiltro] = useState<Filtro>("todos");
@@ -30,22 +66,30 @@ function Admin() {
         .select("id, nombre, dni, documento, created_at")
         .order("created_at", { ascending: false });
       if (error) throw error;
-      return data;
+      return data as Confirmacion[];
     },
   });
-  const rows = (data ?? []).filter((r) => filtro === "todos" || r.documento === filtro);
-  const count = (d: string) => (data ?? []).filter((r) => r.documento === d).length;
+
+  const personas = agrupar(data ?? []);
+  const completos = personas.filter((p) => p.seguro && p.reglamento);
+  const incompletos = personas.filter((p) => !p.seguro || !p.reglamento);
+  const rows =
+    filtro === "completos" ? completos : filtro === "incompletos" ? incompletos : personas;
 
   return (
     <div className="hf-page">
       <HoffmannHeader subtitle="Panel de confirmaciones de lectura" active="admin" />
       <main className="hf-container hf-wide">
         <div className="hf-filters">
-          {(["todos", "seguro", "reglamento"] as Filtro[]).map((f) => (
-            <button key={f} className={filtro === f ? "active" : ""} onClick={() => setFiltro(f)}>
-              {f === "todos" ? `Todos (${data?.length ?? 0})` : f === "seguro" ? `Seguro (${count("seguro")})` : `Reglamento (${count("reglamento")})`}
-            </button>
-          ))}
+          <button className={filtro === "todos" ? "active" : ""} onClick={() => setFiltro("todos")}>
+            Todas ({personas.length})
+          </button>
+          <button className={filtro === "completos" ? "active" : ""} onClick={() => setFiltro("completos")}>
+            Completaron ambos ({completos.length})
+          </button>
+          <button className={filtro === "incompletos" ? "active" : ""} onClick={() => setFiltro("incompletos")}>
+            Les falta alguno ({incompletos.length})
+          </button>
         </div>
         <div className="hf-card hf-table-wrap">
           {isLoading ? (
@@ -57,15 +101,15 @@ function Admin() {
           ) : (
             <table className="hf-table">
               <thead>
-                <tr><th>Nombre</th><th>D.N.I.</th><th>Documento</th><th>Fecha y hora</th></tr>
+                <tr><th>Nombre</th><th>D.N.I.</th><th>Seguro</th><th>Reglamento</th></tr>
               </thead>
               <tbody>
-                {rows.map((r) => (
-                  <tr key={r.id}>
-                    <td>{r.nombre}</td>
-                    <td>{r.dni}</td>
-                    <td><span className={`hf-tag ${r.documento}`}>{r.documento === "seguro" ? "Seguro" : "Reglamento"}</span></td>
-                    <td>{new Date(r.created_at).toLocaleString("es-AR")}</td>
+                {rows.map((p) => (
+                  <tr key={p.dni || p.nombre}>
+                    <td>{p.nombre}</td>
+                    <td>{p.dni}</td>
+                    <td><Tilde fecha={p.seguro} /></td>
+                    <td><Tilde fecha={p.reglamento} /></td>
                   </tr>
                 ))}
               </tbody>
