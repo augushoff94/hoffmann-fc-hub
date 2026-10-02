@@ -21,7 +21,7 @@ export const Route = createFileRoute("/")({
 function Index() {
   return (
     <div className="hf-page">
-      <HoffmannHeader subtitle="Inscripción en 3 pasos obligatorios" active="inicio" />
+      <HoffmannHeader subtitle="Inscripción en 3 pasos" active="inicio" />
       <main className="hf-container">
         <div className="hf-card hf-center">
           <h3>¿Cómo completar tu inscripción?</h3>
