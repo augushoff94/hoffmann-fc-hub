@@ -1,6 +1,6 @@
 # Hoffmann FC Hub
 
-Crear una web para Hoffmann FC integrando los dos archivos adjuntos (index.html que corresponde a Seguro Deportivo y reglamento.html que corresponde a Reglamento Interno) como pestañas de una misma web.
+Web para Hoffmann FC integrando los dos archivos adjuntos (index.html que corresponde a Seguro Deportivo y reglamento.html que corresponde a Reglamento Interno) como pestañas de una misma web.
 
 Requisitos:
 1. Mantener exactamente el diseño, colores, fuentes, botones y contenido tal como están en los archivos adjuntos.
