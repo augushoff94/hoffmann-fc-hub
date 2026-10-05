@@ -85,10 +85,10 @@ function Admin() {
             Todas ({personas.length})
           </button>
           <button className={filtro === "completos" ? "active" : ""} onClick={() => setFiltro("completos")}>
-            Completaron ambos ({completos.length})
+            Ambos ({completos.length})
           </button>
           <button className={filtro === "incompletos" ? "active" : ""} onClick={() => setFiltro("incompletos")}>
-            Les falta alguno ({incompletos.length})
+            Pendientes ({incompletos.length})
           </button>
         </div>
         <div className="hf-card hf-table-wrap">
