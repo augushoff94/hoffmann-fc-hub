@@ -88,7 +88,7 @@ function Login() {
     <form className="hf-card hf-form hf-login" onSubmit={enviar}>
       <h3 className="hf-form-title">{modo === "entrar" ? "Ingresar como administrador" : "Crear cuenta"}</h3>
       <label>Correo<input type="email" required value={email} onChange={(e) => setEmail(e.target.value)} /></label>
-      <label>Contraseña<input type="password" required minLength={6} value={pass} onChange={(e) => setPass(e.target.value)} /></label>
+      <label>Contraseña<input type="password" required minLength={4} value={pass} onChange={(e) => setPass(e.target.value)} /></label>
       {msg && <p className="hf-error">{msg}</p>}
       <button className="hf-btn hf-btn-full" disabled={cargando}>{modo === "entrar" ? "Ingresar" : "Crear cuenta"}</button>
       <button type="button" className="hf-textlink" onClick={() => { setModo(modo === "entrar" ? "registro" : "entrar"); setMsg(""); }}>
