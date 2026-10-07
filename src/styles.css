@@ -199,3 +199,20 @@
 .hf-check.si { color: #1e7d46; font-weight: 700; }
 .hf-check.si small { display: block; font-weight: 400; color: #6b6480; font-size: 0.75rem; }
 .hf-check.no { color: #b9b2cc; }
+.hf-form { display: flex; flex-direction: column; gap: 0.9rem; }
+.hf-form label { display: flex; flex-direction: column; gap: 0.35rem; font-size: 0.88rem; font-weight: 600; color: var(--hf-text); }
+.hf-form input, .hf-form select { padding: 0.75rem 0.9rem; border: 1px solid var(--hf-border); border-radius: 10px; font: inherit; font-weight: 400; background: var(--hf-bg); color: var(--hf-text); }
+.hf-form input:focus, .hf-form select:focus { outline: 2px solid var(--hf-accent); border-color: transparent; }
+.hf-form-title { color: var(--hf-primary); font-size: 1.05rem; margin-top: 0.4rem; }
+.hf-edad { background: var(--hf-soft); color: var(--hf-primary); padding: 0.6rem 0.9rem; border-radius: 10px; font-size: 0.9rem; }
+.hf-error { color: #b42318; font-size: 0.88rem; }
+.hf-btn-full { justify-content: center; width: 100%; border: 0; cursor: pointer; font-size: 1rem; margin-top: 0.4rem; }
+.hf-btn-full:disabled { opacity: 0.6; }
+.hf-login { max-width: 420px; margin: 0 auto; }
+.hf-textlink { background: none; border: 0; color: var(--hf-primary); font-weight: 600; cursor: pointer; text-decoration: underline; font-size: 0.88rem; padding: 0.3rem; }
+.hf-adminbar { display: flex; justify-content: space-between; align-items: center; font-size: 0.85rem; color: var(--hf-text-2); margin-bottom: 0.75rem; gap: 0.5rem; flex-wrap: wrap; }
+.hf-tabs { display: flex; gap: 0.25rem; background: var(--hf-soft); padding: 0.3rem; border-radius: 50px; margin-bottom: 1rem; }
+.hf-tabs button { flex: 1; padding: 0.6rem; border: 0; border-radius: 50px; background: transparent; font-weight: 700; color: var(--hf-text-2); cursor: pointer; }
+.hf-tabs button.active { background: var(--hf-primary); color: var(--hf-on-primary); }
+.hf-count { font-size: 0.9rem; color: var(--hf-text-2); margin-bottom: 0.75rem; }
+.hf-wa { display: block; color: #1e7d46; font-weight: 600; font-size: 0.82rem; }
