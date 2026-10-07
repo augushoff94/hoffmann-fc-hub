@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { calcularEdad } from "@/lib/edad";
 
 const WHATSAPP = "5493794668266";
 const TALLES = ["4", "6", "8", "10", "12", "14", "16", "S", "M", "L"];
@@ -18,17 +19,6 @@ export const Route = createFileRoute("/infantiles")({
   }),
   component: Infantiles,
 });
-
-export function calcularEdad(fecha: string): number | null {
-  if (!fecha) return null;
-  const n = new Date(fecha + "T00:00:00");
-  if (isNaN(n.getTime())) return null;
-  const h = new Date();
-  let e = h.getFullYear() - n.getFullYear();
-  const m = h.getMonth() - n.getMonth();
-  if (m < 0 || (m === 0 && h.getDate() < n.getDate())) e--;
-  return e;
-}
 
 function Infantiles() {
   const [f, setF] = useState({

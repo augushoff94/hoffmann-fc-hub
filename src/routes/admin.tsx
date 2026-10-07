@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import type { Session } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 import { HoffmannHeader } from "@/components/HoffmannHeader";
-import { calcularEdad } from "./infantiles";
+import { calcularEdad } from "@/lib/edad";
 
 export const Route = createFileRoute("/admin")({
   ssr: false,
