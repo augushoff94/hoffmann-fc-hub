@@ -119,7 +119,7 @@ function Panel({ email }: { email: string }) {
   const [tab, setTab] = useState<"adultas" | "infantiles">("adultas");
   return (
     <>
-      <div className="hf-adminbar"><span>{email}</span><Salir /></div>
+      <div className="hf-adminbar"><span>{email.replace("@hoffmannfc.app", "")}</span><Salir /></div>
       <div className="hf-tabs">
         <button className={tab === "adultas" ? "active" : ""} onClick={() => setTab("adultas")}>Adultas</button>
         <button className={tab === "infantiles" ? "active" : ""} onClick={() => setTab("infantiles")}>Infantiles</button>
