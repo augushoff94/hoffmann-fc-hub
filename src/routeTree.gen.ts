@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as InfantilesRouteImport } from './routes/infantiles'
+import { Route as PreinscripcionRouteImport } from './routes/preinscripcion'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -28,35 +29,44 @@ const InfantilesRoute = InfantilesRouteImport.update({
   path: '/infantiles',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PreinscripcionRoute = PreinscripcionRouteImport.update({
+  id: '/preinscripcion',
+  path: '/preinscripcion',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
   '/infantiles': typeof InfantilesRoute
+  '/preinscripcion': typeof PreinscripcionRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
   '/infantiles': typeof InfantilesRoute
+  '/preinscripcion': typeof PreinscripcionRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
   '/infantiles': typeof InfantilesRoute
+  '/preinscripcion': typeof PreinscripcionRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/admin' | '/infantiles'
+  fullPaths: '/' | '/admin' | '/infantiles' | '/preinscripcion'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/admin' | '/infantiles'
-  id: '__root__' | '/' | '/admin' | '/infantiles'
+  to: '/' | '/admin' | '/infantiles' | '/preinscripcion'
+  id: '__root__' | '/' | '/admin' | '/infantiles' | '/preinscripcion'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AdminRoute: typeof AdminRoute
   InfantilesRoute: typeof InfantilesRoute
+  PreinscripcionRoute: typeof PreinscripcionRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -82,6 +92,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof InfantilesRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/preinscripcion': {
+      id: '/preinscripcion'
+      path: '/preinscripcion'
+      fullPath: '/preinscripcion'
+      preLoaderRoute: typeof PreinscripcionRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -89,6 +106,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AdminRoute: AdminRoute,
   InfantilesRoute: InfantilesRoute,
+  PreinscripcionRoute: PreinscripcionRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
