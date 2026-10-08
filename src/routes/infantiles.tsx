@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { calcularEdad } from "@/lib/edad";
 
 const WHATSAPP = "5493794668266";
+const WHATSAPP_17 = "5493794862408";
 const TALLES = ["4", "6", "8", "10", "12", "14", "16", "S", "M", "L"];
 const SEDES = ["Área 93", "Barrio 17 de Agosto"];
 const GOOGLE_FORM =
@@ -49,27 +50,32 @@ function Infantiles() {
       tutor_nombre: f.tutor_nombre.trim(), tutor_telefono: f.tutor_telefono.trim(), sede: f.sede,
     });
     if (error) { setEnviando(false); return setErr("No se pudo enviar la inscripción. Intentá nuevamente."); }
-    // Copia a la planilla de Google (vía el Google Form original)
-    const fd = new URLSearchParams({
-      "entry.56035384": f.nombres.trim(),
-      "entry.989992132": f.apellidos.trim(),
-      "entry.907551032": f.dni.trim(),
-      "entry.1259455725": f.fecha_nacimiento,
-      "entry.182554489": f.talle,
-      "entry.2132429635": `${alergias} | Sede: ${f.sede}`,
-      "entry.743095418": f.tutor_nombre.trim(),
-      "entry.606520516": f.tutor_telefono.trim(),
-    });
-    try {
-      await fetch(GOOGLE_FORM, { method: "POST", mode: "no-cors", body: fd });
-    } catch { /* la inscripción ya quedó guardada */ }
+    const esArea93 = f.sede === "Área 93";
+    if (esArea93) {
+      // Copia a la planilla de Google (vía el Google Form original) — solo Área 93
+      const fd = new URLSearchParams({
+        "entry.56035384": f.nombres.trim(),
+        "entry.989992132": f.apellidos.trim(),
+        "entry.907551032": f.dni.trim(),
+        "entry.1259455725": f.fecha_nacimiento,
+        "entry.182554489": f.talle,
+        "entry.2132429635": `${alergias} | Sede: ${f.sede}`,
+        "entry.743095418": f.tutor_nombre.trim(),
+        "entry.606520516": f.tutor_telefono.trim(),
+      });
+      try {
+        await fetch(GOOGLE_FORM, { method: "POST", mode: "no-cors", body: fd });
+      } catch { /* la inscripción ya quedó guardada */ }
+    }
     setEnviando(false);
+    const accion = esArea93 ? "Acabo de inscribir" : "Acabo de preinscribir";
     const msg =
-      `¡Hola Profe! Acabo de inscribir a ${f.nombres.trim()} ${f.apellidos.trim()} en Hoffmann FC Infantiles.\n` +
+      `¡Hola Profe! ${accion} a ${f.nombres.trim()} ${f.apellidos.trim()} en Hoffmann FC Infantiles.\n` +
       `Sede: ${f.sede}\n` +
       `DNI: ${f.dni.trim()}\nEdad: ${edad} años\nTalle: ${f.talle}\nAlergias: ${alergias}\n` +
       `Tutor: ${f.tutor_nombre.trim()} (${f.tutor_telefono.trim()})`;
-    const url = `https://wa.me/${WHATSAPP}?text=${encodeURIComponent(msg)}`;
+    const numero = esArea93 ? WHATSAPP : WHATSAPP_17;
+    const url = `https://wa.me/${numero}?text=${encodeURIComponent(msg)}`;
     setListo(url);
     window.location.href = url;
   }
