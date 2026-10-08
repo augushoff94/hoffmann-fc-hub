@@ -15,6 +15,13 @@
       "when": 1791393398407,
       "tag": "0001_infantiles_y_roles",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1791420024350,
+      "tag": "0002_sede_infantiles",
+      "breakpoints": true
     }
   ]
 }

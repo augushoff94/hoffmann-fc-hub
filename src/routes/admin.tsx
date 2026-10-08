@@ -61,25 +61,33 @@ function Admin() {
   );
 }
 
+function aCorreo(usuario: string) {
+  const u = usuario.trim().toLowerCase();
+  if (u.includes("@")) return u;
+  return `${u.replace(/[^a-z0-9._-]/g, "")}@hoffmannfc.app`;
+}
+
 function Login() {
   const [modo, setModo] = useState<"entrar" | "registro">("entrar");
-  const [email, setEmail] = useState("");
+  const [usuario, setUsuario] = useState("");
   const [pass, setPass] = useState("");
   const [msg, setMsg] = useState("");
   const [cargando, setCargando] = useState(false);
 
   async function enviar(e: React.FormEvent) {
     e.preventDefault();
-    setMsg(""); setCargando(true);
+    setMsg("");
+    if (pass.length < 6) return setMsg("La contraseña tiene que tener al menos 6 caracteres.");
+    setCargando(true);
+    const email = aCorreo(usuario);
     if (modo === "entrar") {
       const { error } = await supabase.auth.signInWithPassword({ email, password: pass });
-      if (error) setMsg("Correo o contraseña incorrectos (o correo aún sin confirmar).");
+      if (error) setMsg("Usuario o contraseña incorrectos.");
     } else {
-      const { data, error } = await supabase.auth.signUp({
-        email, password: pass, options: { emailRedirectTo: `${window.location.origin}/admin` },
+      const { error } = await supabase.auth.signUp({
+        email, password: pass, options: { data: { usuario: usuario.trim() } },
       });
-      if (error) setMsg(error.message);
-      else if (!data.session) setMsg("Cuenta creada. Revisá tu correo para confirmarla y después ingresá.");
+      if (error) setMsg(error.message.includes("registered") ? "Ese usuario ya existe." : error.message);
     }
     setCargando(false);
   }
@@ -87,8 +95,8 @@ function Login() {
   return (
     <form className="hf-card hf-form hf-login" onSubmit={enviar}>
       <h3 className="hf-form-title">{modo === "entrar" ? "Ingresar como administrador" : "Crear cuenta"}</h3>
-      <label>Correo<input type="email" required value={email} onChange={(e) => setEmail(e.target.value)} /></label>
-      <label>Contraseña<input type="password" required minLength={4} value={pass} onChange={(e) => setPass(e.target.value)} /></label>
+      <label>Usuario<input required autoCapitalize="none" value={usuario} onChange={(e) => setUsuario(e.target.value)} /></label>
+      <label>Contraseña<input type="password" required value={pass} onChange={(e) => setPass(e.target.value)} /></label>
       {msg && <p className="hf-error">{msg}</p>}
       <button className="hf-btn hf-btn-full" disabled={cargando}>{modo === "entrar" ? "Ingresar" : "Crear cuenta"}</button>
       <button type="button" className="hf-textlink" onClick={() => { setModo(modo === "entrar" ? "registro" : "entrar"); setMsg(""); }}>
@@ -111,7 +119,7 @@ function Panel({ email }: { email: string }) {
   const [tab, setTab] = useState<"adultas" | "infantiles">("adultas");
   return (
     <>
-      <div className="hf-adminbar"><span>{email}</span><Salir /></div>
+      <div className="hf-adminbar"><span>{email.replace("@hoffmannfc.app", "")}</span><Salir /></div>
       <div className="hf-tabs">
         <button className={tab === "adultas" ? "active" : ""} onClick={() => setTab("adultas")}>Adultas</button>
         <button className={tab === "infantiles" ? "active" : ""} onClick={() => setTab("infantiles")}>Infantiles</button>
@@ -207,6 +215,7 @@ function soloDigitos(t: string) {
 }
 
 function InfantilesLista() {
+  const [sede, setSede] = useState<"todas" | "Área 93" | "Barrio 17 de Agosto">("todas");
   const { data, isLoading, error } = useQuery({
     queryKey: ["inscripciones_infantiles"],
     queryFn: async () => {
@@ -218,9 +227,16 @@ function InfantilesLista() {
       return data;
     },
   });
-  const rows = data ?? [];
+  const todas = data ?? [];
+  const cuenta = (s: string) => todas.filter((r) => r.sede === s).length;
+  const rows = sede === "todas" ? todas : todas.filter((r) => r.sede === sede);
   return (
     <>
+      <div className="hf-filters">
+        <button className={sede === "todas" ? "active" : ""} onClick={() => setSede("todas")}>Todas ({todas.length})</button>
+        <button className={sede === "Área 93" ? "active" : ""} onClick={() => setSede("Área 93")}>Área 93 ({cuenta("Área 93")})</button>
+        <button className={sede === "Barrio 17 de Agosto" ? "active" : ""} onClick={() => setSede("Barrio 17 de Agosto")}>17 de Agosto ({cuenta("Barrio 17 de Agosto")})</button>
+      </div>
       <p className="hf-count">Inscriptos: <strong>{rows.length}</strong></p>
       <div className="hf-card hf-table-wrap">
         {isLoading ? <p>Cargando…</p> : error ? <p>No se pudieron cargar las inscripciones.</p> : rows.length === 0 ? (
@@ -228,12 +244,13 @@ function InfantilesLista() {
         ) : (
           <table className="hf-table">
             <thead>
-              <tr><th>Nombre</th><th>DNI</th><th>Nacimiento</th><th>Edad</th><th>Talle</th><th>Alergias</th><th>Tutor</th><th>Inscripción</th></tr>
+              <tr><th>Nombre</th><th>Sede</th><th>DNI</th><th>Nacimiento</th><th>Edad</th><th>Talle</th><th>Alergias</th><th>Tutor</th><th>Inscripción</th></tr>
             </thead>
             <tbody>
               {rows.map((r) => (
                 <tr key={r.id}>
                   <td>{r.apellidos}, {r.nombres}</td>
+                  <td>{r.sede}</td>
                   <td>{r.dni}</td>
                   <td>{new Date(r.fecha_nacimiento + "T00:00:00").toLocaleDateString("es-AR")}</td>
                   <td>{calcularEdad(r.fecha_nacimiento)}</td>

@@ -1,0 +1,1 @@
+ALTER TABLE public.inscripciones_infantiles ADD COLUMN sede text NOT NULL DEFAULT 'Área 93';

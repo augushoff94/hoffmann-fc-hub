@@ -47,6 +47,7 @@ export type Database = {
           fecha_nacimiento: string
           id: string
           nombres: string
+          sede: string
           talle: string
           tutor_nombre: string
           tutor_telefono: string
@@ -59,6 +60,7 @@ export type Database = {
           fecha_nacimiento: string
           id?: string
           nombres: string
+          sede?: string
           talle: string
           tutor_nombre: string
           tutor_telefono: string
@@ -71,6 +73,7 @@ export type Database = {
           fecha_nacimiento?: string
           id?: string
           nombres?: string
+          sede?: string
           talle?: string
           tutor_nombre?: string
           tutor_telefono?: string
