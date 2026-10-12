@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as InfantilesRouteImport } from './routes/infantiles'
+import { Route as Infantiles17RouteImport } from './routes/infantiles-17'
 import { Route as PreinscripcionRouteImport } from './routes/preinscripcion'
 
 const IndexRoute = IndexRouteImport.update({
@@ -29,6 +30,11 @@ const InfantilesRoute = InfantilesRouteImport.update({
   path: '/infantiles',
   getParentRoute: () => rootRouteImport,
 } as any)
+const Infantiles17Route = Infantiles17RouteImport.update({
+  id: '/infantiles-17',
+  path: '/infantiles-17',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const PreinscripcionRoute = PreinscripcionRouteImport.update({
   id: '/preinscripcion',
   path: '/preinscripcion',
@@ -39,12 +45,14 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
   '/infantiles': typeof InfantilesRoute
+  '/infantiles-17': typeof Infantiles17Route
   '/preinscripcion': typeof PreinscripcionRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
   '/infantiles': typeof InfantilesRoute
+  '/infantiles-17': typeof Infantiles17Route
   '/preinscripcion': typeof PreinscripcionRoute
 }
 export interface FileRoutesById {
@@ -52,20 +60,29 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
   '/infantiles': typeof InfantilesRoute
+  '/infantiles-17': typeof Infantiles17Route
   '/preinscripcion': typeof PreinscripcionRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/admin' | '/infantiles' | '/preinscripcion'
+  fullPaths:
+    '/' | '/admin' | '/infantiles' | '/infantiles-17' | '/preinscripcion'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/admin' | '/infantiles' | '/preinscripcion'
-  id: '__root__' | '/' | '/admin' | '/infantiles' | '/preinscripcion'
+  to: '/' | '/admin' | '/infantiles' | '/infantiles-17' | '/preinscripcion'
+  id:
+    | '__root__'
+    | '/'
+    | '/admin'
+    | '/infantiles'
+    | '/infantiles-17'
+    | '/preinscripcion'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AdminRoute: typeof AdminRoute
   InfantilesRoute: typeof InfantilesRoute
+  Infantiles17Route: typeof Infantiles17Route
   PreinscripcionRoute: typeof PreinscripcionRoute
 }
 
@@ -92,6 +109,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof InfantilesRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/infantiles-17': {
+      id: '/infantiles-17'
+      path: '/infantiles-17'
+      fullPath: '/infantiles-17'
+      preLoaderRoute: typeof Infantiles17RouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/preinscripcion': {
       id: '/preinscripcion'
       path: '/preinscripcion'
@@ -106,6 +130,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AdminRoute: AdminRoute,
   InfantilesRoute: InfantilesRoute,
+  Infantiles17Route: Infantiles17Route,
   PreinscripcionRoute: PreinscripcionRoute,
 }
 export const routeTree = rootRouteImport

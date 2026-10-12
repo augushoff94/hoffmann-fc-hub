@@ -3,17 +3,15 @@ import { supabase } from "@/integrations/supabase/client";
 import { calcularEdad } from "@/lib/edad";
 
 const TALLES = ["4", "6", "8", "10", "12", "14", "16", "S", "M", "L"];
-const GOOGLE_FORM =
-  "https://docs.google.com/forms/d/e/1FAIpQLSfgY-FQXqma9UY_8kYXl1dxQxEdEXJFK41FOYPOVgCmC9FoVA/formResponse";
 
 type Props = {
   sede: string;
   whatsapp: string;
   preinscripcion?: boolean;
-  enviarGoogleForm?: boolean;
+  googleForm?: string;
 };
 
-export function FormularioInfantiles({ sede, whatsapp, preinscripcion = false, enviarGoogleForm = false }: Props) {
+export function FormularioInfantiles({ sede, whatsapp, preinscripcion = false, googleForm }: Props) {
   const [f, setF] = useState({
     nombres: "", apellidos: "", dni: "", fecha_nacimiento: "", talle: "",
     tieneAlergia: "No", alergiaDetalle: "", tutor_nombre: "", tutor_telefono: "",
@@ -41,8 +39,8 @@ export function FormularioInfantiles({ sede, whatsapp, preinscripcion = false, e
       tutor_nombre: f.tutor_nombre.trim(), tutor_telefono: f.tutor_telefono.trim(), sede,
     });
     if (error) { setEnviando(false); return setErr("No se pudo enviar. Intentá nuevamente."); }
-    if (enviarGoogleForm) {
-      // Copia a la planilla de Google (vía el Google Form original) — solo Área 93
+    if (googleForm) {
+      // Copia a la planilla de Google de la sede
       const fd = new URLSearchParams({
         "entry.56035384": f.nombres.trim(),
         "entry.989992132": f.apellidos.trim(),
@@ -54,7 +52,7 @@ export function FormularioInfantiles({ sede, whatsapp, preinscripcion = false, e
         "entry.606520516": f.tutor_telefono.trim(),
       });
       try {
-        await fetch(GOOGLE_FORM, { method: "POST", mode: "no-cors", body: fd });
+        await fetch(googleForm, { method: "POST", mode: "no-cors", body: fd });
       } catch { /* la inscripción ya quedó guardada */ }
     }
     setEnviando(false);

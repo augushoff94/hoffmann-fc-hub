@@ -13,3 +13,4 @@
 - Read confirmations are stored in the public confirmaciones table (anon insert/select, no auth by request); /admin reads it client-side.
 - /admin requires login; the first account ever created gets the admin role via a DB trigger, and data reads are restricted by RLS to admins — why: protect minors' and players' personal data.
 - /infantiles is a standalone page (no main nav) that inserts into inscripciones_infantiles and hands off to WhatsApp — why: separate category flow requested by the client.
+- Each infantiles sede has its own URL (/infantiles = Área 93, /infantiles-17 = 17 de Agosto) sharing FormularioInfantiles with sede/WhatsApp/Google Form props; /preinscripcion redirects (discontinued) — why: each coach owns their own link and sheet.
