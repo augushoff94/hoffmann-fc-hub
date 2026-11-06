@@ -120,12 +120,43 @@ function Panel({ email }: { email: string }) {
   return (
     <>
       <div className="hf-adminbar"><span>{email.replace("@hoffmannfc.app", "")}</span><Salir /></div>
+      <Enlaces />
       <div className="hf-tabs">
         <button className={tab === "adultas" ? "active" : ""} onClick={() => setTab("adultas")}>Adultas</button>
         <button className={tab === "infantiles" ? "active" : ""} onClick={() => setTab("infantiles")}>Infantiles</button>
       </div>
       {tab === "adultas" ? <Adultas /> : <InfantilesLista />}
     </>
+  );
+}
+
+const LINKS = [
+  { nombre: "Mayores · Fútbol Femenino", path: "/" },
+  { nombre: "Infantiles · Área 93", path: "/infantiles" },
+  { nombre: "Infantiles · 17 de Agosto", path: "/infantiles-17" },
+];
+
+function Enlaces() {
+  const [copiado, setCopiado] = useState("");
+  const base = "https://hoffmann-fc-hub.lovable.app";
+  return (
+    <div className="hf-card">
+      <h3 className="hf-form-title">Enlaces para compartir</h3>
+      {LINKS.map((l) => {
+        const url = base + l.path;
+        return (
+          <div key={l.path} style={{ display: "flex", flexWrap: "wrap", gap: 8, alignItems: "center", justifyContent: "space-between", padding: "8px 0" }}>
+            <span><strong>{l.nombre}</strong><br /><small>{url.replace("https://", "")}</small></span>
+            <span style={{ display: "flex", gap: 6 }}>
+              <button className="hf-textlink" onClick={async () => { await navigator.clipboard.writeText(url); setCopiado(l.path); setTimeout(() => setCopiado(""), 1500); }}>
+                {copiado === l.path ? "¡Copiado!" : "Copiar"}
+              </button>
+              <a className="hf-textlink" href={`https://wa.me/?text=${encodeURIComponent(`${l.nombre} – Hoffmann FC: ${url}`)}`} target="_blank" rel="noreferrer">WhatsApp</a>
+            </span>
+          </div>
+        );
+      })}
+    </div>
   );
 }
 

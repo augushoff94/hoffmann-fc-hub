@@ -9,9 +9,12 @@ type Props = {
   whatsapp: string;
   preinscripcion?: boolean;
   googleForm?: string;
+  /** Mapeo de campos del Google Form de la sede */
+  formato?: "area93" | "17";
+  talles?: string[];
 };
 
-export function FormularioInfantiles({ sede, whatsapp, preinscripcion = false, googleForm }: Props) {
+export function FormularioInfantiles({ sede, whatsapp, preinscripcion = false, googleForm, formato = "area93", talles = TALLES }: Props) {
   const [f, setF] = useState({
     nombres: "", apellidos: "", dni: "", fecha_nacimiento: "", talle: "",
     tieneAlergia: "No", alergiaDetalle: "", tutor_nombre: "", tutor_telefono: "",
@@ -41,16 +44,30 @@ export function FormularioInfantiles({ sede, whatsapp, preinscripcion = false, g
     if (error) { setEnviando(false); return setErr("No se pudo enviar. Intentá nuevamente."); }
     if (googleForm) {
       // Copia a la planilla de Google de la sede
-      const fd = new URLSearchParams({
-        "entry.56035384": f.nombres.trim(),
-        "entry.989992132": f.apellidos.trim(),
-        "entry.907551032": f.dni.trim(),
-        "entry.1259455725": f.fecha_nacimiento,
-        "entry.182554489": f.talle,
-        "entry.2132429635": `${alergias} | Sede: ${sede}`,
-        "entry.743095418": f.tutor_nombre.trim(),
-        "entry.606520516": f.tutor_telefono.trim(),
-      });
+      const [y, m, d] = f.fecha_nacimiento.split("-");
+      const fecha = (id: string) => ({ [`entry.${id}_year`]: y, [`entry.${id}_month`]: String(+m), [`entry.${id}_day`]: String(+d) });
+      const fd = new URLSearchParams(
+        formato === "17"
+          ? {
+              "entry.1093746211": `${f.nombres.trim()} ${f.apellidos.trim()}`,
+              "entry.1852697567": f.dni.trim(),
+              ...fecha("454039818"),
+              "entry.425512716": `Talle ${f.talle}`,
+              "entry.612940069": alergias,
+              "entry.403095107": f.tutor_nombre.trim(),
+              "entry.1899032900": f.tutor_telefono.trim(),
+            }
+          : {
+              "entry.56035384": f.nombres.trim(),
+              "entry.989992132": f.apellidos.trim(),
+              "entry.907551032": f.dni.trim(),
+              ...fecha("1259455725"),
+              "entry.182554489": f.talle,
+              "entry.2132429635": alergias,
+              "entry.743095418": f.tutor_nombre.trim(),
+              "entry.606520516": f.tutor_telefono.trim(),
+            },
+      );
       try {
         await fetch(googleForm, { method: "POST", mode: "no-cors", body: fd });
       } catch { /* la inscripción ya quedó guardada */ }
@@ -97,7 +114,7 @@ export function FormularioInfantiles({ sede, whatsapp, preinscripcion = false, g
             <label>Talle de camiseta
               <select required value={f.talle} onChange={set("talle")}>
                 <option value="">Elegí un talle</option>
-                {TALLES.map((t) => <option key={t} value={t}>{t}</option>)}
+                {talles.map((t) => <option key={t} value={t}>{t}</option>)}
               </select>
             </label>
             <label>¿Tiene alergias?
