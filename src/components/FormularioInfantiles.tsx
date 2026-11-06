@@ -44,7 +44,7 @@ export function FormularioInfantiles({ sede, whatsapp, preinscripcion = false, g
     if (error) { setEnviando(false); return setErr("No se pudo enviar. Intentá nuevamente."); }
     if (googleForm) {
       // Copia a la planilla de Google de la sede
-      const [y, m, d] = f.fecha_nacimiento.split("-");
+      const [y = "", m = "", d = ""] = f.fecha_nacimiento.split("-");
       const fecha = (id: string) => ({ [`entry.${id}_year`]: y, [`entry.${id}_month`]: String(+m), [`entry.${id}_day`]: String(+d) });
       const fd = new URLSearchParams(
         formato === "17"
