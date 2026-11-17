@@ -16,8 +16,8 @@ export const Route = createFileRoute("/infantiles-17")({
     <FormularioInfantiles
       sede="Barrio 17 de Agosto"
       whatsapp="5493794862408"
-      googleForm="https://docs.google.com/forms/d/e/1FAIpQLSdemy4jwbHgsEfdNTifRA9TLKVgZVeCYJyXEgQ1wHEKvIqyUQ/formResponse"
-      formato="17"
+      // Pegar acá la URL de la "Aplicación web" del Apps Script de la planilla del 17
+      appsScript=""
       talles={["6", "8", "10", "12", "14", "16"]}
     />
   ),

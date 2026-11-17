@@ -12,9 +12,11 @@ type Props = {
   /** Mapeo de campos del Google Form de la sede */
   formato?: "area93" | "17";
   talles?: string[];
+  /** URL del Apps Script de la planilla de la sede (guarda directo en Drive) */
+  appsScript?: string;
 };
 
-export function FormularioInfantiles({ sede, whatsapp, preinscripcion = false, googleForm, formato = "area93", talles = TALLES }: Props) {
+export function FormularioInfantiles({ sede, whatsapp, preinscripcion = false, googleForm, formato = "area93", talles = TALLES, appsScript }: Props) {
   const [f, setF] = useState({
     nombres: "", apellidos: "", dni: "", fecha_nacimiento: "", talle: "",
     tieneAlergia: "No", alergiaDetalle: "", tutor_nombre: "", tutor_telefono: "",
@@ -70,6 +72,18 @@ export function FormularioInfantiles({ sede, whatsapp, preinscripcion = false, g
       );
       try {
         await fetch(googleForm, { method: "POST", mode: "no-cors", body: fd });
+      } catch { /* la inscripción ya quedó guardada */ }
+    }
+    if (appsScript) {
+      try {
+        await fetch(appsScript, {
+          method: "POST", mode: "no-cors",
+          body: JSON.stringify({
+            nombre: `${f.nombres.trim()} ${f.apellidos.trim()}`, dni: f.dni.trim(),
+            nacimiento: f.fecha_nacimiento, edad, talle: f.talle, alergias,
+            tutor: f.tutor_nombre.trim(), telefono: f.tutor_telefono.trim(), sede,
+          }),
+        });
       } catch { /* la inscripción ya quedó guardada */ }
     }
     setEnviando(false);
