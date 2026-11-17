@@ -29,6 +29,13 @@
       "when": 1794956857096,
       "tag": "0003_tighten_inscripciones_insert",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1794956883436,
+      "tag": "0004_relax_inscripciones_formats",
+      "breakpoints": true
     }
   ]
 }
