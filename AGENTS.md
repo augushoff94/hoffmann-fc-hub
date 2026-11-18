@@ -14,3 +14,5 @@
 - /admin requires login; the first account ever created gets the admin role via a DB trigger, and data reads are restricted by RLS to admins — why: protect minors' and players' personal data.
 - /infantiles is a standalone page (no main nav) that inserts into inscripciones_infantiles and hands off to WhatsApp — why: separate category flow requested by the client.
 - Each infantiles sede has its own URL (/infantiles = Área 93, /infantiles-17 = 17 de Agosto) sharing FormularioInfantiles with sede/WhatsApp/Google Form props; /preinscripcion redirects (discontinued) — why: each coach owns their own link and sheet.
+- Admin player mutations use the authenticated browser client with admin-only RLS; grouped adult confirmations retain every source ID so changes cover all documents without changing acknowledgement timestamps.
+- Admin CSV exports use the currently filtered rows and escape spreadsheet formulas; external Sheets records are not mutated by local player management.

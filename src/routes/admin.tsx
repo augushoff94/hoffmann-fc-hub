@@ -5,6 +5,10 @@ import type { Session } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 import { HoffmannHeader } from "@/components/HoffmannHeader";
 import { calcularEdad } from "@/lib/edad";
+import { Search, Download } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { AdminPlayerActions } from "@/components/AdminPlayerActions";
+import { agrupar, coincideBusqueda, descargarCsv, type Confirmacion } from "@/lib/admin-listas";
 
 export const Route = createFileRoute("/admin")({
   ssr: false,
@@ -34,7 +38,8 @@ function Admin() {
     queryKey: ["es-admin", session?.user.id],
     enabled: !!session,
     queryFn: async () => {
-      const { data } = await supabase.rpc("has_role", { _user_id: session!.user.id, _role: "admin" });
+      if (!session) return false;
+      const { data } = await supabase.rpc("has_role", { _user_id: session.user.id, _role: "admin" });
       return !!data;
     },
   });
@@ -161,21 +166,6 @@ function Enlaces() {
 }
 
 type Filtro = "todos" | "completos" | "incompletos";
-type Confirmacion = { id: string; nombre: string; dni: string; documento: string; created_at: string };
-type Persona = { nombre: string; dni: string; seguro: string | null; reglamento: string | null };
-
-function agrupar(data: Confirmacion[]): Persona[] {
-  const mapa = new Map<string, Persona>();
-  for (const r of data) {
-    const clave = r.dni.trim().toLowerCase() || r.nombre.trim().toLowerCase();
-    const actual = mapa.get(clave) ?? { nombre: r.nombre, dni: r.dni, seguro: null, reglamento: null };
-    if (r.documento === "seguro" && (!actual.seguro || r.created_at > actual.seguro)) actual.seguro = r.created_at;
-    if (r.documento === "reglamento" && (!actual.reglamento || r.created_at > actual.reglamento)) actual.reglamento = r.created_at;
-    mapa.set(clave, actual);
-  }
-  return [...mapa.values()].sort((a, b) => a.nombre.localeCompare(b.nombre, "es"));
-}
-
 function Tilde({ fecha }: { fecha: string | null }) {
   if (!fecha) return <span className="hf-check no">—</span>;
   return (
@@ -187,6 +177,7 @@ function Tilde({ fecha }: { fecha: string | null }) {
 
 function Adultas() {
   const [filtro, setFiltro] = useState<Filtro>("todos");
+  const [busqueda, setBusqueda] = useState("");
   const { data, isLoading, error } = useQuery({
     queryKey: ["confirmaciones"],
     queryFn: async () => {
@@ -202,7 +193,8 @@ function Adultas() {
   const personas = agrupar(data ?? []);
   const completos = personas.filter((p) => p.seguro && p.reglamento);
   const incompletos = personas.filter((p) => !p.seguro || !p.reglamento);
-  const rows = filtro === "completos" ? completos : filtro === "incompletos" ? incompletos : personas;
+  const filtradas = filtro === "completos" ? completos : filtro === "incompletos" ? incompletos : personas;
+  const rows = filtradas.filter((p) => coincideBusqueda(busqueda, p.nombre, p.dni));
 
   return (
     <>
@@ -217,17 +209,22 @@ function Adultas() {
           Pendientes ({incompletos.length})
         </button>
       </div>
+      <HerramientasLista busqueda={busqueda} setBusqueda={setBusqueda} disabled={isLoading || !!error || rows.length === 0} exportar={() => descargarCsv(`hoffmann-adultas-${filtro}.csv`, [
+        ["Nombre", "DNI", "Seguro", "Reglamento"],
+        ...rows.map((p) => [p.nombre, p.dni, fechaExportacion(p.seguro), fechaExportacion(p.reglamento)]),
+      ])} />
       <div className="hf-card hf-table-wrap">
         {isLoading ? <p>Cargando…</p> : error ? <p>No se pudieron cargar las confirmaciones.</p> : rows.length === 0 ? (
-          <p>Todavía no hay confirmaciones.</p>
+          <p>{personas.length ? "No hay coincidencias con estos filtros." : "Todavía no hay confirmaciones."}</p>
         ) : (
           <table className="hf-table">
-            <thead><tr><th>Nombre</th><th>D.N.I.</th><th>Seguro</th><th>Reglamento</th></tr></thead>
+            <thead><tr><th>Nombre</th><th>D.N.I.</th><th>Seguro</th><th>Reglamento</th><th className="hf-actions-cell">Acciones</th></tr></thead>
             <tbody>
               {rows.map((p) => (
                 <tr key={p.dni || p.nombre}>
                   <td>{p.nombre}</td><td>{p.dni}</td>
                   <td><Tilde fecha={p.seguro} /></td><td><Tilde fecha={p.reglamento} /></td>
+                  <td className="hf-actions-cell"><AdminPlayerActions target={{ tipo: "adultas", persona: p }} /></td>
                 </tr>
               ))}
             </tbody>
@@ -247,6 +244,7 @@ function soloDigitos(t: string) {
 
 function InfantilesLista() {
   const [sede, setSede] = useState<"todas" | "Área 93" | "Barrio 17 de Agosto">("todas");
+  const [busqueda, setBusqueda] = useState("");
   const { data, isLoading, error } = useQuery({
     queryKey: ["inscripciones_infantiles"],
     queryFn: async () => {
@@ -260,7 +258,7 @@ function InfantilesLista() {
   });
   const todas = data ?? [];
   const cuenta = (s: string) => todas.filter((r) => r.sede === s).length;
-  const rows = sede === "todas" ? todas : todas.filter((r) => r.sede === sede);
+  const rows = todas.filter((r) => (sede === "todas" || r.sede === sede) && coincideBusqueda(busqueda, `${r.apellidos} ${r.nombres}`, `${r.nombres} ${r.apellidos}`, r.dni));
   return (
     <>
       <div className="hf-filters">
@@ -268,14 +266,18 @@ function InfantilesLista() {
         <button className={sede === "Área 93" ? "active" : ""} onClick={() => setSede("Área 93")}>Área 93 ({cuenta("Área 93")})</button>
         <button className={sede === "Barrio 17 de Agosto" ? "active" : ""} onClick={() => setSede("Barrio 17 de Agosto")}>17 de Agosto ({cuenta("Barrio 17 de Agosto")})</button>
       </div>
+      <HerramientasLista busqueda={busqueda} setBusqueda={setBusqueda} disabled={isLoading || !!error || rows.length === 0} exportar={() => descargarCsv(`hoffmann-infantiles-${sede}.csv`, [
+        ["Apellidos", "Nombres", "Sede", "DNI", "Nacimiento", "Edad", "Talle", "Alergias", "Tutor", "Teléfono", "Inscripción (Argentina)"],
+        ...rows.map((r) => [r.apellidos, r.nombres, r.sede, r.dni, r.fecha_nacimiento, calcularEdad(r.fecha_nacimiento), r.talle, r.alergias, r.tutor_nombre, r.tutor_telefono, fechaExportacion(r.created_at)]),
+      ])} />
       <p className="hf-count">Inscriptos: <strong>{rows.length}</strong></p>
       <div className="hf-card hf-table-wrap">
         {isLoading ? <p>Cargando…</p> : error ? <p>No se pudieron cargar las inscripciones.</p> : rows.length === 0 ? (
-          <p>Todavía no hay inscripciones.</p>
+          <p>{todas.length ? "No hay coincidencias con estos filtros." : "Todavía no hay inscripciones."}</p>
         ) : (
           <table className="hf-table">
             <thead>
-              <tr><th>Nombre</th><th>Sede</th><th>DNI</th><th>Nacimiento</th><th>Edad</th><th>Talle</th><th>Alergias</th><th>Tutor</th><th>Inscripción</th></tr>
+              <tr><th>Nombre</th><th>Sede</th><th>DNI</th><th>Nacimiento</th><th>Edad</th><th>Talle</th><th>Alergias</th><th>Tutor</th><th>Inscripción</th><th className="hf-actions-cell">Acciones</th></tr>
             </thead>
             <tbody>
               {rows.map((r) => (
@@ -294,6 +296,7 @@ function InfantilesLista() {
                     </a>
                   </td>
                   <td>{new Date(r.created_at).toLocaleString("es-AR")}</td>
+                  <td className="hf-actions-cell"><AdminPlayerActions target={{ tipo: "infantiles", persona: r }} /></td>
                 </tr>
               ))}
             </tbody>
@@ -302,4 +305,15 @@ function InfantilesLista() {
       </div>
     </>
   );
+}
+
+function fechaExportacion(fecha: string | null) {
+  return fecha ? new Date(fecha).toLocaleString("es-AR", { timeZone: "America/Argentina/Buenos_Aires" }) : "Pendiente";
+}
+
+function HerramientasLista({ busqueda, setBusqueda, exportar, disabled }: { busqueda: string; setBusqueda: (s: string) => void; exportar: () => void; disabled: boolean }) {
+  return <div className="hf-list-tools">
+    <label className="hf-search"><Search aria-hidden="true" size={18} /><input type="search" aria-label="Buscar por nombre o DNI" placeholder="Nombre o DNI" value={busqueda} onChange={(e) => setBusqueda(e.target.value)} /></label>
+    <Button variant="outline" className="hf-action" onClick={exportar} disabled={disabled}><Download />Descargar CSV</Button>
+  </div>;
 }

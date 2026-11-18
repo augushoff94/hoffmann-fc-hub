@@ -216,3 +216,27 @@
 .hf-tabs button.active { background: var(--hf-primary); color: var(--hf-on-primary); }
 .hf-count { font-size: 0.9rem; color: var(--hf-text-2); margin-bottom: 0.75rem; }
 .hf-wa { display: block; color: #1e7d46; font-weight: 600; font-size: 0.82rem; }
+
+/* Administración: conserva los colores de Hoffmann en controles y ventanas. */
+.hf-list-tools { display: flex; flex-wrap: wrap; align-items: center; gap: 0.75rem; margin-bottom: 1rem; }
+.hf-search { display: flex; align-items: center; gap: 0.5rem; flex: 1 1 210px; border: 1px solid var(--hf-border); background: var(--hf-card); color: var(--hf-text-2); padding: 0.5rem 0.75rem; border-radius: 8px; }
+.hf-search input { min-width: 0; width: 100%; background: transparent; color: var(--hf-text); outline: none; font-size: 0.9rem; }
+.hf-search:focus-within { outline: 2px solid var(--hf-accent); }
+.hf-action { color: var(--hf-primary); border-color: var(--hf-border); background: var(--hf-card); }
+.hf-action:hover { background: var(--hf-soft); color: var(--hf-primary); }
+.hf-action-danger { color: var(--destructive); }
+.hf-action-danger:hover { color: var(--destructive); }
+.hf-action-primary { background: var(--hf-primary); color: var(--hf-on-primary); }
+.hf-action-primary:hover { background: var(--hf-primary-light); }
+.hf-row-actions { display: flex; gap: 4px; }
+.hf-table .hf-actions-cell { position: sticky; right: 0; background: var(--hf-card); width: 92px; min-width: 92px; border-left: 1px solid var(--hf-border); }
+.hf-admin-dialog { font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; color: var(--hf-text); background: var(--hf-card); border-color: var(--hf-border); border-radius: 8px; width: calc(100% - 2rem); max-height: calc(100dvh - 2rem); overflow-y: auto; }
+.hf-admin-dialog h2 { color: var(--hf-primary); line-height: 1.4; }
+.hf-admin-dialog .hf-form textarea { padding: 0.75rem 0.9rem; border: 1px solid var(--hf-border); border-radius: 8px; font: inherit; font-weight: 400; background: var(--hf-bg); color: var(--hf-text); resize: vertical; }
+.hf-admin-dialog .hf-form textarea:focus { outline: 2px solid var(--hf-accent); }
+.hf-edit-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.75rem; }
+.hf-edit-grid input, .hf-edit-grid select { min-width: 0; width: 100%; }
+.hf-edit-full { grid-column: 1 / -1; }
+.hf-dialog-actions { display: flex; justify-content: flex-end; gap: 0.5rem; }
+.hf-management-note { font-size: 0.8rem; color: var(--hf-text-2); }
+@media (max-width: 480px) { .hf-edit-grid { grid-template-columns: minmax(0, 1fr); } }
